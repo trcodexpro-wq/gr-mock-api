@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 
-// ✅ CORS ekle
+// ✅ CORS
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -47,18 +47,18 @@ app.post("/api/GoodsReceipt", (req, res) => {
     }
 
     for (const item of Items) {
-        if (!item.PurchaseOrder) {
+        if (!item.PurchaseOrder || item.PurchaseOrder.trim() === "") {
             return res.status(400).json({
                 ReturnType:       "E",
-                ReturnMessage:    "PurchaseOrder eksik",
+                ReturnMessage:    "PurchaseOrder eksik — lütfen önce PO eşleştirmesi yapın",
                 MaterialDocument: null,
                 MatDocumentYear:  null
             });
         }
-        if (!item.PurchaseOrderItem) {
+        if (!item.PurchaseOrderItem || item.PurchaseOrderItem.trim() === "") {
             return res.status(400).json({
                 ReturnType:       "E",
-                ReturnMessage:    "PurchaseOrderItem eksik",
+                ReturnMessage:    "PurchaseOrderItem eksik — lütfen önce PO eşleştirmesi yapın",
                 MaterialDocument: null,
                 MatDocumentYear:  null
             });
