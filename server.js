@@ -1,18 +1,10 @@
-const express = require("express");
-const app = express();
-app.use(express.json());
-
-app.get("/", (req, res) => {
-    res.json({ status: "GR Mock API çalışıyor" });
-});
-
 app.post("/api/GoodsReceipt", (req, res) => {
-    const { Date, DeliveryNo, InvoiceNo, Items } = req.body;
+    // ✅ Date yerine docDate kullan — JS built-in Date ile çakışıyor
+    const { Date: docDate, DeliveryNo, InvoiceNo, Items } = req.body;
 
     console.log("GR Request:", JSON.stringify(req.body, null, 2));
 
-    // Validasyon
-    if (!Date) {
+    if (!docDate) {
         return res.status(400).json({
             ReturnType:       "E",
             ReturnMessage:    "Date zorunlu",
@@ -59,15 +51,12 @@ app.post("/api/GoodsReceipt", (req, res) => {
 
     // ✅ Başarılı — MatDoc numarası üret
     const matDocNumber = "5000" + Math.floor(Math.random() * 900000 + 100000).toString();
-    const matDocYear   = new Date().getFullYear().toString();
+    const matDocYear   = new globalThis.Date().getFullYear().toString();
 
     return res.status(200).json({
         ReturnType:       "S",
         ReturnMessage:    `Goods Receipt başarıyla oluşturuldu. ${Items.length} kalem işlendi. DeliveryNo: ${DeliveryNo || "-"}`,
-        MaterialDocument: matDocNumber,  // ✅ örn: 5000123456
-        MatDocumentYear:  matDocYear     // ✅ örn: 2026
+        MaterialDocument: matDocNumber,
+        MatDocumentYear:  matDocYear
     });
 });
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`GR API port ${PORT}de çalışıyor`));
