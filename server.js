@@ -1,15 +1,27 @@
 const express = require("express");
 const app = express();
+
+// ✅ CORS ekle
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+    res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    if (req.method === "OPTIONS") {
+        return res.status(200).end();
+    }
+    next();
+});
+
 app.use(express.json());
 
-const getNow = () => new (global.Date)(); // ✅ global.Date kullan
+const getNow = () => new (global.Date)();
 
 app.get("/", (req, res) => {
     res.json({ status: "GR Mock API çalışıyor" });
 });
 
 app.post("/api/GoodsReceipt", (req, res) => {
-    const body = req.body;
+    const body       = req.body;
     const docDate    = body.Date;
     const DeliveryNo = body.DeliveryNo;
     const Items      = body.Items;
@@ -38,7 +50,7 @@ app.post("/api/GoodsReceipt", (req, res) => {
         if (!item.PurchaseOrder) {
             return res.status(400).json({
                 ReturnType:       "E",
-                ReturnMessage:    `PurchaseOrder eksik`,
+                ReturnMessage:    "PurchaseOrder eksik",
                 MaterialDocument: null,
                 MatDocumentYear:  null
             });
@@ -46,7 +58,7 @@ app.post("/api/GoodsReceipt", (req, res) => {
         if (!item.PurchaseOrderItem) {
             return res.status(400).json({
                 ReturnType:       "E",
-                ReturnMessage:    `PurchaseOrderItem eksik`,
+                ReturnMessage:    "PurchaseOrderItem eksik",
                 MaterialDocument: null,
                 MatDocumentYear:  null
             });
@@ -54,7 +66,7 @@ app.post("/api/GoodsReceipt", (req, res) => {
         if (!item.EntryQuantity || item.EntryQuantity <= 0) {
             return res.status(400).json({
                 ReturnType:       "E",
-                ReturnMessage:    `EntryQuantity geçersiz`,
+                ReturnMessage:    "EntryQuantity geçersiz",
                 MaterialDocument: null,
                 MatDocumentYear:  null
             });
@@ -62,7 +74,7 @@ app.post("/api/GoodsReceipt", (req, res) => {
     }
 
     const matDocNumber = "5000" + Math.floor(Math.random() * 900000 + 100000).toString();
-    const matDocYear   = String(getNow().getFullYear()); // ✅ global.Date
+    const matDocYear   = String(getNow().getFullYear());
 
     return res.status(200).json({
         ReturnType:       "S",
