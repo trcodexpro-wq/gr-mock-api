@@ -1,6 +1,5 @@
-const express = require("express");
+server.js : "const express = require("express");
 const app = express();
-
 // ✅ CORS
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "*");
@@ -11,23 +10,17 @@ app.use((req, res, next) => {
     }
     next();
 });
-
 app.use(express.json());
-
-const getNow = () => new (global.Date)();
-
+const getNow = () => new ([global.Date](http://global.Date))();
 app.get("/", (req, res) => {
     res.json({ status: "GR Mock API çalışıyor" });
 });
-
-app.post("/api/GoodsReceipt", (req, res) => {
+[app.post](http://app.post)("/api/GoodsReceipt", (req, res) => {
     const body       = req.body;
-    const docDate    = body.Date;
+    const docDate    = [body.Date](http://body.Date);
     const DeliveryNo = body.DeliveryNo;
     const Items      = body.Items;
-
     console.log("GR Request:", JSON.stringify(body, null, 2));
-
     if (!docDate) {
         return res.status(400).json({
             ReturnType:       "E",
@@ -36,7 +29,6 @@ app.post("/api/GoodsReceipt", (req, res) => {
             MatDocumentYear:  null
         });
     }
-
     if (!Items || !Array.isArray(Items) || Items.length === 0) {
         return res.status(400).json({
             ReturnType:       "E",
@@ -45,7 +37,6 @@ app.post("/api/GoodsReceipt", (req, res) => {
             MatDocumentYear:  null
         });
     }
-
     for (const item of Items) {
         if (!item.PurchaseOrder || item.PurchaseOrder.trim() === "") {
             return res.status(400).json({
@@ -72,10 +63,8 @@ app.post("/api/GoodsReceipt", (req, res) => {
             });
         }
     }
-
     const matDocNumber = "5000" + Math.floor(Math.random() * 900000 + 100000).toString();
     const matDocYear   = String(getNow().getFullYear());
-
     return res.status(200).json({
         ReturnType:       "S",
         ReturnMessage:    `Goods Receipt başarıyla oluşturuldu. ${Items.length} kalem işlendi. DeliveryNo: ${DeliveryNo || "-"}`,
@@ -83,6 +72,6 @@ app.post("/api/GoodsReceipt", (req, res) => {
         MatDocumentYear:  matDocYear
     });
 });
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`GR API port ${PORT}de çalışıyor`));
+" mevcut hali bu şekilde sen ekleyip verebilir misin tamamını
