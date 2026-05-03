@@ -14,6 +14,31 @@ app.use((req, res, next) => {
 
 app.use(express.json());
 
+// ✅ Basic Auth middleware
+const basicAuth = (req, res, next) => {
+    const authHeader = req.headers["authorization"];
+
+    if (!authHeader || !authHeader.startsWith("Basic ")) {
+        res.setHeader("WWW-Authenticate", 'Basic realm="GR Mock API"');
+        return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const base64 = authHeader.split(" ")[1];
+    const decoded = Buffer.from(base64, "base64").toString("utf-8");
+    const [username, password] = decoded.split(":");
+
+    // ✅ Kullanıcı adı ve şifre — Render Environment Variables'dan al
+    const validUser = process.env.API_USERNAME || "admin";
+    const validPass = process.env.API_PASSWORD || "secret";
+
+    if (username !== validUser || password !== validPass) {
+        res.setHeader("WWW-Authenticate", 'Basic realm="GR Mock API"');
+        return res.status(401).json({ error: "Invalid credentials" });
+    }
+
+    next();
+};
+
 const getNow = () => new (global.Date)();
 
 // ✅ Mock PO Data
@@ -32,8 +57,8 @@ app.get("/", (req, res) => {
     res.json({ status: "GR Mock API çalışıyor" });
 });
 
-// ✅ GET /api/POList — tüm liste, opsiyonel filtreler
-app.get("/api/POList", (req, res) => {
+// ✅ GET /api/POList — basicAuth zorunlu
+app.get("/api/POList", basicAuth, (req, res) => {
     console.log("POList isteği alındı, query:", req.query);
 
     const { EBELN, MATNR, WERKS } = req.query;
@@ -47,8 +72,8 @@ app.get("/api/POList", (req, res) => {
     return res.status(200).json({ value: result });
 });
 
-// ✅ GET /api/POList/:ebeln — tekil PO
-app.get("/api/POList/:ebeln", (req, res) => {
+// ✅ GET /api/POList/:ebeln — basicAuth zorunlu
+app.get("/api/POList/:ebeln", basicAuth, (req, res) => {
     const { ebeln } = req.params;
     const result = mockPOList.filter(p => p.EBELN === ebeln);
 
@@ -59,8 +84,8 @@ app.get("/api/POList/:ebeln", (req, res) => {
     return res.status(200).json({ value: result });
 });
 
-// ✅ POST /api/GoodsReceipt
-app.post("/api/GoodsReceipt", (req, res) => {
+// ✅ POST /api/GoodsReceipt — basicAuth zorunlu
+app.post("/api/GoodsReceipt", basicAuth, (req, res) => {
     const body       = req.body;
     const docDate    = body.Date;
     const DeliveryNo = body.DeliveryNo;
